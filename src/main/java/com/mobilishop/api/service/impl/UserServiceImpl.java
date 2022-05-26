@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userToUpdate.setGender(user.getGender());
         userToUpdate.setUpdatedAt(LocalDateTime.now());
         userToUpdate.setAddress(user.getAddress());
-        userToUpdate.setRoles(user.getRoles());
+
         return userRepository.save(userToUpdate);
     }
 
