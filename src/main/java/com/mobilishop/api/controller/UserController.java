@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/register")
-    public User registerUser(@RequestBody User user) {
+    public String registerUser(@RequestBody User user) {
         System.out.println("UserController.registerUser()");
         return userService.createUser(user);
     }
@@ -62,8 +63,22 @@ public class UserController {
 
     @DeleteMapping("/api/v1/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        System.out.println("BEFORE UserController.deleteUser()");
         userService.deleteUser(id);
+        System.out.println("UserController.deleteUser()");
         return ResponseEntity.ok("User with id " + id + " deleted");
+    }
+
+    @GetMapping("/api/v1/users/me")
+    @ResponseBody
+    public String getCurrentUser(Authentication authentication) {
+
+        return authentication.getName();
+    }
+
+    @GetMapping("/api/v1/register/confirm")
+    public String confirmUserAccount( @RequestParam("token") String token) {
+        return userService.confirmToken(token);
     }
 
     @GetMapping("/api/token/refresh")

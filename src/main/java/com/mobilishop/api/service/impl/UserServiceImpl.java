@@ -1,25 +1,27 @@
 package com.mobilishop.api.service.impl;
 
+import com.mobilishop.api.email.EmailSender;
 import com.mobilishop.api.enums.AppUserRole;
 import com.mobilishop.api.exception.ApiRequestException;
+import com.mobilishop.api.model.ConfirmationToken;
 import com.mobilishop.api.model.Role;
 import com.mobilishop.api.model.User;
 import com.mobilishop.api.repository.RoleRepository;
 import com.mobilishop.api.repository.UserRepository;
+import com.mobilishop.api.service.ConfirmationTokenService;
 import com.mobilishop.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -28,15 +30,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RoleRepository roleRepository;
     //private final PasswordEncoder passwordEncoder;
 
+    private final ConfirmationTokenService confirmationTokenService;
+
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final static String USER_NOT_FOUND_MESSAGE = "User with username %s not found";
+
+    private final EmailSender emailSender;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, username));
+        }
+
+        if ( !user.isEnabled() ) {
+            //throw new ApiRequestException("User is not enabled");
+            throw new UsernameNotFoundException("User is not enabled");
         }
 
         Collection<SimpleGrantedAuthority>  authorities = new ArrayList<>(user.getRoles().size());
@@ -46,8 +57,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
+    public User getCurrentUser() {
+        return userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+
     @Override
-    public User createUser(User user) {
+    public String createUser(User user) {
         System.out.println("UserServiceImpl.createUser()");
         // Check email validity
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
@@ -81,15 +96,36 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         // Set default values for locked and enabled
         user.setLocked(false);
-        user.setEnabled(true);
+        user.setEnabled(false);
         // Set default values for createdAt and updatedAt
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
-        // TODO: Send confirmation token to user's email
+        User newUser = userRepository.save(user);
 
+        // Send confirmation token
+        String token = UUID.randomUUID().toString();
+        ConfirmationToken confirmationToken = new ConfirmationToken(
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(1),
+                newUser
+        );
 
-        return userRepository.save(user);
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
+
+        // TODO: SEND EMAIL
+        emailSender.send(
+                user.getEmail(),
+                buildEmailConfirmationLink(token)
+        );
+
+        return token;
+
+    }
+
+    private String buildEmailConfirmationLink(String token) {
+        return "http://localhost:8080/api/v1/register/confirm?token=" + token;
     }
 
     @Override
@@ -104,6 +140,32 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new ApiRequestException("Id is required");
         }
         return userRepository.findById(id).orElseThrow(() -> new ApiRequestException("User with id " + id + " not found"));
+    }
+
+    @Transactional
+    public String confirmToken(String token) {
+        ConfirmationToken confirmationToken = confirmationTokenService.
+                getToken(token)
+                .orElseThrow(() -> new ApiRequestException("Confirmation token not found"));
+
+        if ( confirmationToken.getConfirmedAt() != null ) {
+            throw new ApiRequestException("Confirmation token already confirmed");
+        }
+
+        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+
+        if ( expiredAt.isBefore(LocalDateTime.now()) ) {
+            throw new ApiRequestException("Confirmation token expired");
+        }
+
+        confirmationTokenService.setConfirmedAt(token);
+
+
+        // Enable user
+        User user = confirmationToken.getUser();
+        user.setEnabled(true);
+        userRepository.save(user);
+        return "User " + user.getUsername() + " successfully confirmed";
     }
 
     @Override
@@ -162,8 +224,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void deleteUser(Long id) {
+        System.out.println("UserServiceImpl.deleteUser()");
         User user = userRepository.findById(id).orElseThrow(() -> new ApiRequestException("User with id " + id + " not found"));
-        userRepository.deleteById(id);
+
+        // if authenticated user is admin we can delete any user
+        Collection<SimpleGrantedAuthority>  authorities = new ArrayList<>(user.getRoles().size());
+        getCurrentUser().getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        });
+        // delete if user as authorities role admin
+        if (authorities.contains(new SimpleGrantedAuthority(AppUserRole.ROLE_ADMIN.name()))) {
+            userRepository.delete(user);
+        } else {
+            // if authenticated user is not admin we can only delete user with id = authenticated user id
+            if (getCurrentUser().getUsername().equals(user.getUsername())) {
+                userRepository.delete(user);
+            } else {
+                throw new ApiRequestException("You are not allowed to delete this user");
+            }
+        }
     }
 
     private User checkUserAndRoleExists(String userEmail, String roleName) {

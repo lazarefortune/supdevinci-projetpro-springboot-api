@@ -1,5 +1,6 @@
 package com.mobilishop.api.security;
 
+import com.mobilishop.api.enums.AppUserRole;
 import com.mobilishop.api.filter.CustomAuthenticationFilter;
 import com.mobilishop.api.filter.CustomAuthorizationFilter;
 import com.mobilishop.api.handler.AccessDeniedHandlerJwt;
@@ -51,8 +52,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 */
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/login", "/api/v*/register" ,"/api/token/refresh/**", "/api/v*/products/**").permitAll()
-                .antMatchers("/api/v*/users/**").hasAnyAuthority("ROLE_USER")
+                .antMatchers(
+                        "/api/login",
+                        "/api/v*/register" ,
+                        "/api/v*/register/*",
+                        "/api/token/refresh/**",
+                        "/api/v*/products/**"
+                ).permitAll()
+                .antMatchers("/api/v*/users/**").hasAnyAuthority(
+                        AppUserRole.ROLE_USER.name(),
+                        AppUserRole.ROLE_ADMIN.name(),
+                        AppUserRole.ROLE_SUPER_ADMIN.name(),
+                        AppUserRole.ROLE_CUSTOMER.name()
+                )
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPointJwt)
