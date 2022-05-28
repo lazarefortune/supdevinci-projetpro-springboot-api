@@ -5,8 +5,7 @@ name: "Format code"
 
 on:
   push:
-    branches:
-      - main
+    branches: [ prod, dev, main, master ]
 
 jobs:
   formatting:
