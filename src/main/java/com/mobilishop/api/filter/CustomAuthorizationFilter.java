@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mobilishop.api.service.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,20 +39,21 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             if ( authorizationHeader != null && authorizationHeader.startsWith("Bearer ") ){
                 try {
                     String token = authorizationHeader.substring("Bearer ".length());
-                    System.out.println("token: " + token);
+                    //System.out.println("token: " + token);
                     Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);
                     String username = decodedJWT.getSubject();
+
                     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-                    System.out.println("username: " + username);
-                    System.out.println("roles: " + stream(roles).collect(Collectors.joining(",")));
+                    //System.out.println("username: " + username);
+                    //System.out.println("roles: " + stream(roles).collect(Collectors.joining(",")));
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     stream(roles).forEach(role -> {
-                        System.out.println("role: " + role);
+                        //System.out.println("role: " + role);
                         authorities.add(new SimpleGrantedAuthority(role));
                     });
-                    System.out.println("authorities: " + authorities);
+                    //System.out.println("authorities: " + authorities);
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(username, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);

@@ -16,13 +16,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {ApiRequestException.class})
     public ResponseEntity<Object> handleApiRequestException(ApiRequestException ex) {
-        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        if ( ex.getHttpStatus() == null ) {
+            ex.setHttpStatus(HttpStatus.BAD_REQUEST);
+        }
+
         ApiException apiException = new ApiException(
                 ex.getMessage(),
-                HttpStatus.BAD_REQUEST,
+                ex.getHttpStatus(),
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(apiException, badRequest );
+        return new ResponseEntity<>(apiException, ex.getHttpStatus());
     }
 
     @Override

@@ -60,12 +60,12 @@ public class User {
     @Column( nullable = false )
     private Boolean enabled = false;
 
- /*   @JoinTable(
+    @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
-    )*/
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    )
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Collection<Role> roles;
 
     private LocalDateTime createdAt = LocalDateTime.now();
