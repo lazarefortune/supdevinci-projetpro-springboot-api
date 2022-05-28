@@ -40,11 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/login");
 /*
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
+        http.authorizeRequests().antMatchers("/api/v1/login/**").permitAll();
         http.authorizeRequests().antMatchers( GET, "/api/v1/users/**" ).hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter( customAuthenticationFilter );
@@ -53,11 +53,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers(
-                        "/api/login",
+                        "/api/v1/login",
                         "/api/v*/register" ,
                         "/api/v*/register/*",
-                        "/api/token/refresh/**",
-                        "/api/v*/products/**"
+                        "/api/v1/token/refresh/**",
+                        "/api/v*/products/**",
+                        "/api/v*/products/*",
+                        "/api/v*/categories/**"
                 ).permitAll()
                 .antMatchers("/api/v*/users/**").hasAnyAuthority(
                         AppUserRole.ROLE_USER.name(),

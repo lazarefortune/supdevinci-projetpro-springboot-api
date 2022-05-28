@@ -45,10 +45,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new UsernameNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, username));
         }
 
+        /*
         if ( !user.isEnabled() ) {
             //throw new ApiRequestException("User is not enabled");
             throw new UsernameNotFoundException("User is not enabled");
         }
+        */
 
         Collection<SimpleGrantedAuthority>  authorities = new ArrayList<>(user.getRoles().size());
         user.getRoles().forEach(role -> {

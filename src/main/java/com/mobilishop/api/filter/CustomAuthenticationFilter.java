@@ -34,6 +34,19 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        try {
+            Map<String, String> credentials = new ObjectMapper().readValue(request.getInputStream(), Map.class);
+            String username = credentials.get("username");
+            String password = credentials.get("password");
+            System.out.println("username: " + username);
+            System.out.println("password: " + password);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+            return authenticationManager.authenticate(authenticationToken);
+        } catch (IOException e) {
+            throw new ApiRequestException("Invalid email or password", FORBIDDEN);
+        }
+
+        /*
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         if (username == null || password == null) {
@@ -42,6 +55,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         return authenticationManager.authenticate(authenticationToken);
+         */
     }
 
     @Override
