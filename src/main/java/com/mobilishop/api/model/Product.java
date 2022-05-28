@@ -11,30 +11,27 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Table(
-        name = "products",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "product_name_unique",  columnNames = "name")
-        }
-)
+    name = "products",
+    uniqueConstraints = {@UniqueConstraint(name = "product_name_unique", columnNames = "name")})
 public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+  @Column(nullable = false, unique = true)
+  private String name;
 
-    private String description;
+  private String description;
 
-    //@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    //@JoinColumn(name = "user_id", nullable = false)
-    //private User author;
+  // @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  // @JoinColumn(name = "user_id", nullable = false)
+  // private User author;
 
-    private Double price;
+  private Double price;
 
-    @Column(nullable = true)
-    private String image;
+  @Column(nullable = true)
+  private String image;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Category category;
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  private Category category;
 }

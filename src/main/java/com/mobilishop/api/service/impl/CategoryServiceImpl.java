@@ -11,44 +11,43 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    CategoryRepository categoryRepository;
+  @Autowired CategoryRepository categoryRepository;
 
-    @Override
-    public Category getCategoryById(Long id) {
-        return categoryRepository.findById(id).orElse(null);
-       /* return categoryRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Category not found with id: " + id)
-        );*/
-    }
+  @Override
+  public Category getCategoryById(Long id) {
+    return categoryRepository.findById(id).orElse(null);
+    /* return categoryRepository.findById(id).orElseThrow(
+            () -> new RuntimeException("Category not found with id: " + id)
+    );*/
+  }
 
-    @Override
-    public Category getCategoryByName(String name) {
-        return categoryRepository.findByName(name);
-    }
+  @Override
+  public Category getCategoryByName(String name) {
+    return categoryRepository.findByName(name);
+  }
 
-    @Override
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
-    }
+  @Override
+  public List<Category> getAllCategories() {
+    return categoryRepository.findAll();
+  }
 
-    @Override
-    public Category createOne(Category category) {
-        return categoryRepository.save(category);
-    }
+  @Override
+  public Category createOne(Category category) {
+    return categoryRepository.save(category);
+  }
 
-    @Override
-    public Category updateOne(Category category) {
-        return categoryRepository.save(category);
-    }
+  @Override
+  public Category updateOne(Category category) {
+    return categoryRepository.save(category);
+  }
 
-    @Override
-    public void deleteOne(Long id) {
-        categoryRepository.deleteById(id);
-    }
+  @Override
+  public void deleteOne(Long id) {
+    categoryRepository.deleteById(id);
+  }
 
-    @Override
-    public List<Category> getCategoriesByUser(Long user) {
-        return null;
-    }
+  @Override
+  public List<Category> getCategoriesByUser(Long user) {
+    return null;
+  }
 }

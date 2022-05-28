@@ -4,11 +4,11 @@ import com.mobilishop.api.model.Role;
 import java.util.List;
 
 public interface RoleService {
-    Role createOne(Role role);
+  Role createOne(Role role);
 
-    List<Role> findAllRoles();
+  List<Role> findAllRoles();
 
-    Role findRoleById(Long id);
+  Role findRoleById(Long id);
 
-    Role findRoleByName(String name);
+  Role findRoleByName(String name);
 }

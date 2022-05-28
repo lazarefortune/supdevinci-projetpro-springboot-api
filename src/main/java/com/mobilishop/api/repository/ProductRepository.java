@@ -7,10 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Product findByName(String name);
+  Product findByName(String name);
 
-    @Query("select p from Product p " +
-            "where p.name like %?1% " +
-            "or p.description like %?1%")
-    List<Product> searchProducts(String query);
+  @Query("select p from Product p " + "where p.name like %?1% " + "or p.description like %?1%")
+  List<Product> searchProducts(String query);
 }

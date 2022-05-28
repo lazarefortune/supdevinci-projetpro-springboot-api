@@ -23,63 +23,65 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final UserDetailsService userDetailsService;
+  private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    private AuthenticationEntryPointJwt authenticationEntryPointJwt;
+  @Autowired private AuthenticationEntryPointJwt authenticationEntryPointJwt;
 
-    @Autowired
-    private AccessDeniedHandlerJwt accessDeniedHandlerJwt;
+  @Autowired private AccessDeniedHandlerJwt accessDeniedHandlerJwt;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
-    }
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+  }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
-/*
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
-        http.authorizeRequests().antMatchers( GET, "/api/v1/users/**" ).hasAnyAuthority("ROLE_USER");
-        http.authorizeRequests().anyRequest().authenticated();
-        http.addFilter( customAuthenticationFilter );
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-*/
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers(
-                        "/api/login",
-                        "/api/v*/register" ,
-                        "/api/v*/register/*",
-                        "/api/token/refresh/**",
-                        "/api/v*/products/**"
-                ).permitAll()
-                .antMatchers("/api/v*/users/**").hasAnyAuthority(
-                        AppUserRole.ROLE_USER.name(),
-                        AppUserRole.ROLE_ADMIN.name(),
-                        AppUserRole.ROLE_SUPER_ADMIN.name(),
-                        AppUserRole.ROLE_CUSTOMER.name()
-                )
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPointJwt)
-                .and()
-                .exceptionHandling().accessDeniedHandler(accessDeniedHandlerJwt)
-                .and()
-                .addFilter(customAuthenticationFilter)
-                .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    CustomAuthenticationFilter customAuthenticationFilter =
+        new CustomAuthenticationFilter(authenticationManagerBean());
+    customAuthenticationFilter.setFilterProcessesUrl("/api/login");
+    /*
+            http.csrf().disable();
+            http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            http.authorizeRequests().antMatchers("/api/login/**").permitAll();
+            http.authorizeRequests().antMatchers( GET, "/api/v1/users/**" ).hasAnyAuthority("ROLE_USER");
+            http.authorizeRequests().anyRequest().authenticated();
+            http.addFilter( customAuthenticationFilter );
+            http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    */
+    http.csrf()
+        .disable()
+        .authorizeRequests()
+        .antMatchers(
+            "/api/login",
+            "/api/v*/register",
+            "/api/v*/register/*",
+            "/api/token/refresh/**",
+            "/api/v*/products/**")
+        .permitAll()
+        .antMatchers("/api/v*/users/**")
+        .hasAnyAuthority(
+            AppUserRole.ROLE_USER.name(),
+            AppUserRole.ROLE_ADMIN.name(),
+            AppUserRole.ROLE_SUPER_ADMIN.name(),
+            AppUserRole.ROLE_CUSTOMER.name())
+        .anyRequest()
+        .authenticated()
+        .and()
+        .exceptionHandling()
+        .authenticationEntryPoint(authenticationEntryPointJwt)
+        .and()
+        .exceptionHandling()
+        .accessDeniedHandler(accessDeniedHandlerJwt)
+        .and()
+        .addFilter(customAuthenticationFilter)
+        .addFilterBefore(
+            new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+  }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
+  @Bean
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 }
-

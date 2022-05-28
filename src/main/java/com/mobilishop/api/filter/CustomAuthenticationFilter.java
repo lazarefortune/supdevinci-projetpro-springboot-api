@@ -26,53 +26,66 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final AuthenticationManager authenticationManager;
+  private final AuthenticationManager authenticationManager;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+  public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+    this.authenticationManager = authenticationManager;
+  }
+
+  @Override
+  public Authentication attemptAuthentication(
+      HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
+    if (username == null || password == null) {
+      // throw new RuntimeException("Username or password is empty");
+      throw new ApiRequestException("Username or password is empty", FORBIDDEN);
     }
+    UsernamePasswordAuthenticationToken authenticationToken =
+        new UsernamePasswordAuthenticationToken(username, password);
+    return authenticationManager.authenticate(authenticationToken);
+  }
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        if (username == null || password == null) {
-            //throw new RuntimeException("Username or password is empty");
-            throw new ApiRequestException("Username or password is empty", FORBIDDEN);
-        }
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-        return authenticationManager.authenticate(authenticationToken);
-    }
+  @Override
+  protected void successfulAuthentication(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      FilterChain chain,
+      Authentication authentication)
+      throws IOException, ServletException {
+    User user = (User) authentication.getPrincipal();
+    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        User user = (User) authentication.getPrincipal();
-        Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+    String accessToken =
+        JWT.create()
+            .withSubject(user.getUsername())
+            .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
+            .withIssuer(request.getRequestURL().toString())
+            .withClaim(
+                "roles",
+                user.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()))
+            .sign(algorithm);
 
-        String accessToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
-                .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-                .sign(algorithm);
+    Integer expiresInMinutes = 60;
+    String refreshToken =
+        JWT.create()
+            .withSubject(user.getUsername())
+            .withExpiresAt(new Date(System.currentTimeMillis() + 120 * 60 * 1000))
+            .withIssuer(request.getRequestURL().toString())
+            .sign(algorithm);
+    /*
+           response.addHeader("accessToken", accessToken);
+           response.addHeader("refreshToken", refreshToken);
 
-        Integer expiresInMinutes = 60;
-        String refreshToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 120 * 60 * 1000))
-                .withIssuer(request.getRequestURL().toString())
-                .sign(algorithm);
-/*
-        response.addHeader("accessToken", accessToken);
-        response.addHeader("refreshToken", refreshToken);
-
- */
-        Map<String , String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-               // .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-        //super.successfulAuthentication(request, response, chain, authResult);
-    }
+    */
+    Map<String, String> tokens = new HashMap<>();
+    tokens.put("accessToken", accessToken);
+    tokens.put("refreshToken", refreshToken);
+    response.setContentType(APPLICATION_JSON_VALUE);
+    new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+    // .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
+    // super.successfulAuthentication(request, response, chain, authResult);
+  }
 }
