@@ -32,9 +32,9 @@ public class Product {
 
     private Double price;
 
-    @Column(nullable = true)
     private String image;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER )
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 }

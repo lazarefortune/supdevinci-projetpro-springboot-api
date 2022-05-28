@@ -49,9 +49,6 @@ public class CategoryController {
         existsCategory.setImage(category.getImage());
 
         return ResponseEntity.ok(categoryService.updateOne(existsCategory));
-
-        //return categoryService.updateOne(category);
-        //return ResponseEntity.ok(updatedCategory);
     }
 
     @PostMapping

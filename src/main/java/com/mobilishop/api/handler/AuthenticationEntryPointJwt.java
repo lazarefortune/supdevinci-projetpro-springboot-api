@@ -17,6 +17,7 @@ public class AuthenticationEntryPointJwt implements org.springframework.security
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        /*
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
@@ -27,7 +28,7 @@ public class AuthenticationEntryPointJwt implements org.springframework.security
         final ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
 
-        /*
+         */
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
@@ -38,6 +39,6 @@ public class AuthenticationEntryPointJwt implements org.springframework.security
         final ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
 
-         */
+
     }
 }

@@ -31,8 +31,8 @@ public class ProductController {
     }
 
     @GetMapping("/category/{category}")
-    public Product getProductByCategory(@PathVariable String category) {
-        return productService.getProductByCategory(category);
+    public List<Product> getProductsByCategory(@PathVariable String category) {
+        return productService.getProductsByCategory(category);
     }
 
     @GetMapping
@@ -43,18 +43,17 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> createOne(@RequestBody Product product) {
         return ResponseEntity.ok(productService.createOne(product));
-        //return null;
     }
 
-    @PutMapping ("/{id}")
-    public ResponseEntity<Product> updateOne(@RequestBody Product product) {
-        //return productService.updateOne(id, name);
-        return null;
+    @PutMapping ("/{productId}")
+    public ResponseEntity<Product> updateOne( @PathVariable Long productId, @RequestBody Product product) {
+        return ResponseEntity.ok(productService.updateOne(productId, product));
     }
 
     @DeleteMapping ("/{id}")
-    public void deleteOne(@PathVariable Long id) {
+    public ResponseEntity<String> deleteOne(@PathVariable Long id) {
         productService.deleteOne(id);
+        return ResponseEntity.ok("Product deleted successfully");
     }
 
     @GetMapping("/user/{userId}")

@@ -81,7 +81,7 @@ public class UserController {
         return userService.confirmToken(token);
     }
 
-    @GetMapping("/api/token/refresh")
+    @GetMapping("/api/v1/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         if ( authorizationHeader != null && authorizationHeader.startsWith("Bearer ") ){
