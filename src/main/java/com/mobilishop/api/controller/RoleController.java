@@ -13,23 +13,20 @@ import java.util.List;
 @PreAuthorize("hasRole( 'ADMIN' )")
 public class RoleController {
 
-    @Autowired
-    private RoleService roleService;
+  @Autowired private RoleService roleService;
 
-    @PostMapping
-    public Role createNewRole(@RequestBody Role role)
-    {
-        return roleService.createOne(role);
-    }
+  @PostMapping
+  public Role createNewRole(@RequestBody Role role) {
+    return roleService.createOne(role);
+  }
 
-    @GetMapping("/{id}")
-    public Role getUserById(@PathVariable Long id) {
-        return roleService.findRoleById(id);
-    }
+  @GetMapping("/{id}")
+  public Role getUserById(@PathVariable Long id) {
+    return roleService.findRoleById(id);
+  }
 
-    @GetMapping
-    public List<Role> getAllRoles()
-    {
-        return roleService.findAllRoles();
-    }
+  @GetMapping
+  public List<Role> getAllRoles() {
+    return roleService.findAllRoles();
+  }
 }

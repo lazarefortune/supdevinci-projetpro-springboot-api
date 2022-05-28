@@ -5,19 +5,25 @@ import com.mobilishop.api.model.User;
 import java.util.List;
 
 public interface UserService {
-    String createUser(User user);
-    List<User> findAllUsers();
-    User findUserById(Long id);
-    User findUserByEmail(String email);
-    User findByUserName(String userName);
-    User updateUser(Long id, User user);
-    void deleteUser(Long id);
+  String createUser(User user);
 
-    String confirmToken(String token);
+  List<User> findAllUsers();
 
-    void addRoleToUser(String userEmail, String roleName);
+  User findUserById(Long id);
 
-    void removeRoleFromUser(String userEmail, String roleName);
+  User findUserByEmail(String email);
 
-    void init();
+  User findByUserName(String userName);
+
+  User updateUser(Long id, User user);
+
+  void deleteUser(Long id);
+
+  String confirmToken(String token);
+
+  void addRoleToUser(String userEmail, String roleName);
+
+  void removeRoleFromUser(String userEmail, String roleName);
+
+  void init();
 }

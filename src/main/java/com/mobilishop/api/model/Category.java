@@ -11,23 +11,19 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Data
 @Table(
-        name = "categories",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "category_name_unique",  columnNames = "name")
-        }
-)
+    name = "categories",
+    uniqueConstraints = {@UniqueConstraint(name = "category_name_unique", columnNames = "name")})
 public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+  @Column(name = "name", nullable = false, unique = true)
+  private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT", nullable = true)
-    private String description;
+  @Column(name = "description", columnDefinition = "TEXT", nullable = true)
+  private String description;
 
-    @Column(name = "image", nullable = true)
-    private String image;
-
+  @Column(name = "image", nullable = true)
+  private String image;
 }
