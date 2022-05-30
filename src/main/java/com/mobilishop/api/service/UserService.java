@@ -1,5 +1,6 @@
 package com.mobilishop.api.service;
 
+import com.mobilishop.api.model.Card;
 import com.mobilishop.api.model.User;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public interface UserService {
   void addRoleToUser(String userEmail, String roleName);
 
   void removeRoleFromUser(String userEmail, String roleName);
+
+  Card addCardToUser(Long userId, Card card);
 
   void init();
 }

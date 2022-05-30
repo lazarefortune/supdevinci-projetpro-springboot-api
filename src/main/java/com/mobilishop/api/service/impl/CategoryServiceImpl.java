@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Service
@@ -15,6 +16,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+
 
     @Override
     public Category getCategoryById(Long id) {

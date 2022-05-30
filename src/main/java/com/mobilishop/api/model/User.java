@@ -4,6 +4,7 @@ import com.mobilishop.api.enums.AppUserRole;
 import com.mobilishop.api.enums.Gender;
 import lombok.Data;
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
@@ -20,25 +21,12 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-  /*
-  @GeneratedValue(
-          strategy = GenerationType.SEQUENCE,
-          generator = "user_id_seq"
-  )
-  @Column(
-          name = "id",
-          unique = true,
-          nullable = false,
-          updatable = false
-  )
-  private Long id;
-  */
 
   private String firstName;
 
   private String lastName;
 
-  private LocalDateTime birthday;
+  private LocalDate birthday;
 
   private String phoneNumber;
 

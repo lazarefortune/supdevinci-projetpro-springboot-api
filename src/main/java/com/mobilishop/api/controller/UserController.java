@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.mobilishop.api.model.Card;
 import com.mobilishop.api.model.Role;
 import com.mobilishop.api.model.User;
 import com.mobilishop.api.service.UserService;
@@ -119,5 +120,10 @@ public class UserController {
         }else{
             throw new RuntimeException("JWT Refresh Token is missing");
         }
+    }
+
+    @PostMapping("/api/v1/users/{userId}/card")
+    public ResponseEntity<Card> addCard(@PathVariable Long userId, @RequestBody Card card) {
+        return ResponseEntity.ok(userService.addCardToUser(userId, card));
     }
 }

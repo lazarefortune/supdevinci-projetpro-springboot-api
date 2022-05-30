@@ -3,6 +3,7 @@ package com.mobilishop.api.service.impl;
 import com.mobilishop.api.email.EmailSender;
 import com.mobilishop.api.enums.AppUserRole;
 import com.mobilishop.api.exception.ApiRequestException;
+import com.mobilishop.api.model.Card;
 import com.mobilishop.api.model.ConfirmationToken;
 import com.mobilishop.api.model.Role;
 import com.mobilishop.api.model.User;
@@ -292,6 +293,46 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         user.getRoles().remove(role);
         userRepository.save(user);
+    }
+
+    @Override
+    public Card addCardToUser( Long userId, Card card ) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ApiRequestException("User with id " + userId + " not found")
+        );
+        // check card number validity
+        if (card.getCardNumber() == null || card.getCardNumber().isEmpty()) {
+            throw new ApiRequestException("Card number is invalid");
+        }
+        // check card number format validity
+        if (!card.getCardNumber().matches("^[0-9]{16}$")) {
+            throw new ApiRequestException("Card number format is invalid");
+        }
+        // check card expiration date validity
+        if (card.getExpirationDate() == null || card.getExpirationDate().isEmpty()) {
+            throw new ApiRequestException("Card expiration date is invalid");
+        }
+        // check card expiration date format validity
+        if (!card.getExpirationDate().matches("^[0-9]{4}-[0-9]{2}$")) {
+            throw new ApiRequestException("Card expiration date format is invalid");
+        }
+        // check card cvv validity
+        if (card.getCvv() == null || card.getCvv().isEmpty()) {
+            throw new ApiRequestException("Card cvv is invalid");
+        }
+        // check card cvv format validity
+        if (!card.getCvv().matches("^[0-9]{3}$")) {
+            throw new ApiRequestException("Card cvv format is invalid");
+        }
+        // check if card have cardHolderName
+        if (card.getCardHolderName() == null || card.getCardHolderName().isEmpty()) {
+            throw new ApiRequestException("Card holder name is invalid");
+        }
+
+        card.setUser(user);
+        user.getCards().add(card);
+        Card newCard = userRepository.save(user).getCards().stream().filter(c -> c.getCardNumber().equals(card.getCardNumber())).findFirst().orElse(null);
+        return newCard;
     }
 
     public void init() {

@@ -1,18 +1,22 @@
 package com.mobilishop.api.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(
     name = "cards",
     uniqueConstraints = {
       @UniqueConstraint(name = "card_number_unique", columnNames = "cardNumber")
     })
 public class Card {
-  @Id private Long Id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long Id;
 
   @Column(nullable = false, unique = true)
   private String cardNumber;
@@ -21,18 +25,14 @@ public class Card {
   private String cardHolderName;
 
   @Column(nullable = false)
-  private String expiryDate;
+  private String expirationDate;
 
   @Column(nullable = false)
   private String cvv;
+
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  private String billingAddress;
-  private String billingCity;
-  private String billingState;
-  private String billingCountry;
-  private String billingZip;
 }
