@@ -5,16 +5,15 @@ import com.mobilishop.api.model.Stock;
 import java.util.List;
 
 public interface StockService {
-    Stock findByProductId(Long productId);
+  Stock findByProductId(Long productId);
 
-    Stock findByProductName(String productName);
+  Stock findByProductName(String productName);
 
-    Stock createOne(Stock stock);
+  Stock createOne(Stock stock);
 
-    Stock updateOne(Stock stock);
+  Stock updateOne(Stock stock);
 
-    void deleteOne(Long id);
+  void deleteOne(Long id);
 
-    List<Stock> findAllStocks();
-
+  List<Stock> findAllStocks();
 }

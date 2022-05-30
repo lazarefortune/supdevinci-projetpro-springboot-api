@@ -18,5 +18,4 @@ public interface CategoryService {
   void deleteOne(Long id);
 
   List<Category> getCategoriesByUser(Long user);
-
 }

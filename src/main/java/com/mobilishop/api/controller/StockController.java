@@ -11,37 +11,35 @@ import java.util.List;
 @RequestMapping("/api/v1/stocks")
 public class StockController {
 
-    @Autowired
-    private StockService stockService;
+  @Autowired private StockService stockService;
 
-    @GetMapping
-    public List<Stock> getStock() {
-        return stockService.findAllStocks();
-    }
+  @GetMapping
+  public List<Stock> getStock() {
+    return stockService.findAllStocks();
+  }
 
-    @GetMapping("/{id}")
-    public Stock getStockById(@PathVariable Long id) {
-        return stockService.findByProductId(id);
-    }
+  @GetMapping("/{id}")
+  public Stock getStockById(@PathVariable Long id) {
+    return stockService.findByProductId(id);
+  }
 
-    @GetMapping("/name")
-    public Stock getStockByProductName(@RequestBody String productName) {
-        return stockService.findByProductName(productName);
-    }
+  @GetMapping("/name")
+  public Stock getStockByProductName(@RequestBody String productName) {
+    return stockService.findByProductName(productName);
+  }
 
-    @PostMapping
-    public Stock createStock(@RequestBody Stock stock) {
-        return stockService.createOne(stock);
-    }
+  @PostMapping
+  public Stock createStock(@RequestBody Stock stock) {
+    return stockService.createOne(stock);
+  }
 
-    @PutMapping
-    public Stock updateStock(@RequestBody Stock stock) {
-        return stockService.updateOne(stock);
-    }
+  @PutMapping
+  public Stock updateStock(@RequestBody Stock stock) {
+    return stockService.updateOne(stock);
+  }
 
-    @DeleteMapping("/{id}")
-    public void deleteStock(@PathVariable Long id) {
-        stockService.deleteOne(id);
-    }
-
+  @DeleteMapping("/{id}")
+  public void deleteStock(@PathVariable Long id) {
+    stockService.deleteOne(id);
+  }
 }
